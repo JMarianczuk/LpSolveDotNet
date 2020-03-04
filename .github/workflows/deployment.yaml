@@ -1,9 +1,13 @@
 name: Deployment
 
 on:
+  # Temporary disable deployment which run too often, see https://github.community/t5/GitHub-Actions/How-to-run-GitHub-Actions-Workflow-only-for-new-tags/m-p/48698/highlight/true#M7254
   push:
-    tags:
-      - v[0-9]+.[0-9]+.[0-9]+*
+    branches-ignore:
+      - '**'
+  # create:
+    # tags:
+    #   - v[0-9]+.[0-9]+.[0-9]+*
 
 jobs:
   deploy:
