@@ -34,11 +34,15 @@ jobs:
 
     - name: Test
       run: |
-        echo "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_ID #$env:GITHUB_RUN_NUMBER"
+        echo "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_NUMBER"
         git --version
-        pushd $env:GITHUB_WORKSPACE/output/docs
+        echo "pushd $env:GITHUB_WORKSPACE/output/docs"
+        pushd "$env:GITHUB_WORKSPACE/output/docs"
+        echo "git add ."
         git add .
-        git commit -m "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_ID #$env:GITHUB_RUN_NUMBER"
+        echo "git commit -m something"
+        git commit -m "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_NUMBER"
+        echo popd
         popd
 
     # - name: Checkin git-hub pages
