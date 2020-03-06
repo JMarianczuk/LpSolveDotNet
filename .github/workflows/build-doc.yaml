@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    if: github.repository == 'MarcelGosselin/LpSolveDotNet'
 
     runs-on: windows-latest
 
@@ -27,14 +28,24 @@ jobs:
         ref: gh-pages
         path: output/docs
 
+    - name: Add dummy content to doc
+      run: |
+        echo "This is from GitHub action" >> $env:GITHUB_WORKSPACE/output/docs/dummy.md
+
     - name: Test
       run: |
-        echo "PWD = $PWD"
-        echo "GITHUB_WORKSPACE = $env:GITHUB_WORKSPACE"
-        echo "content of GITHUB_WORKSPACE root"
-        ls "$env:GITHUB_WORKSPACE"
-        echo "content of GITHUB_WORKSPACE/output/docs root"
-        ls "$env:GITHUB_WORKSPACE/output/docs"
+        echo "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_ID #$env:GITHUB_RUN_NUMBER"
+        git --version
+        pushd $env:GITHUB_WORKSPACE/output/docs
+        git add .
+        git commit -m "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_ID #$env:GITHUB_RUN_NUMBER"
+        popd
+
+    # - name: Checkin git-hub pages
+    #   uses: zwaldowski/git-commit-action@v1
+    #   with:
+    #     ref: gh-pages
+    #     path: output/docs
 
     # - name: Setup MSBuild.exe
     #   uses: warrenbuckley/Setup-MSBuild@v1
