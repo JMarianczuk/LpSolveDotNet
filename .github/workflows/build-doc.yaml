@@ -30,11 +30,11 @@ jobs:
     - name: Test
       run: |
         echo "PWD = $PWD"
-        echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
+        echo "GITHUB_WORKSPACE = $env:GITHUB_WORKSPACE"
         echo "content of GITHUB_WORKSPACE root"
-        ls "$GITHUB_WORKSPACE"
+        ls "$env:GITHUB_WORKSPACE"
         echo "content of GITHUB_WORKSPACE/output/docs root"
-        ls "$GITHUB_WORKSPACE/output/docs"
+        ls "$env:GITHUB_WORKSPACE/output/docs"
 
     # - name: Setup MSBuild.exe
     #   uses: warrenbuckley/Setup-MSBuild@v1
