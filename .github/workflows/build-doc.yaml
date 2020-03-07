@@ -47,7 +47,7 @@ jobs:
     #   run: git commit -m "${{env.commit_message}}"
     - name: Prepare commit
       working-directory: ${{env.ghpages_root}}
-      shell: bash
+      shell: bash {0}
       run: |
         git add . ;
         git diff --quiet --exit-code --staged ;
