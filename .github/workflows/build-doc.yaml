@@ -35,9 +35,6 @@ jobs:
         ref: ${{env.ghpages_branch}}
         path: ${{env.ghpages_root_relative}}
 
-    - name: Add dummy content to doc
-      run: echo "This is from GitHub action" >> ${{env.ghpages_root}}/dummy.md
-
     - name: Prepare commit
       working-directory: ${{env.ghpages_root}}
       # The {0} here prevents the failfast behaviour of the shell and makes sure
