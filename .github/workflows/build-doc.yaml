@@ -38,13 +38,6 @@ jobs:
     - name: Add dummy content to doc
       run: echo "This is from GitHub action" >> ${{env.ghpages_root}}/dummy.md
 
-    # - name: Add files for git-hub pages commit 
-    #   working-directory: ${{env.ghpages_root}}
-    #   run: git add .
-
-    # - name: Commit git-hub pages
-    #   working-directory: ${{env.ghpages_root}}
-    #   run: git commit -m "${{env.commit_message}}"
     - name: Prepare commit
       working-directory: ${{env.ghpages_root}}
       # The {0} here prevents the failfast behaviour of the shell and makes sure
@@ -54,7 +47,7 @@ jobs:
         git add .
         git diff --quiet --exit-code --staged
         if [ $? -eq 1 ]; then
-          echo"::set-env name=has_changes_to_commit::1"
+          echo "::set-env name=has_changes_to_commit::1"
         fi
 
     - name: Commit files for git-hub pages commit
