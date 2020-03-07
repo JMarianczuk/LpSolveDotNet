@@ -33,17 +33,26 @@ jobs:
         echo "This is from GitHub action" >> $env:GITHUB_WORKSPACE/output/docs/dummy.md
 
     - name: Test
+      working-directory: $env:GITHUB_WORKSPACE/output/docs
       run: |
-        echo "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_NUMBER"
-        git --version
-        echo "pushd $env:GITHUB_WORKSPACE/output/docs"
-        pushd "$env:GITHUB_WORKSPACE/output/docs"
-        echo "git add ."
+        ls -al
+
+    - name: Add files for git-hub pages commit 
+      working-directory: $env:GITHUB_WORKSPACE/output/docs
+      run: |
         git add .
-        echo "git commit -m something"
+
+    - name: Commit git-hub pages
+      working-directory: $env:GITHUB_WORKSPACE/output/docs
+      run: |
         git commit -m "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_NUMBER"
-        echo popd
-        popd
+
+    - name: Push git-hub pages
+      uses: ad-m/github-push-action@0.5.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        directory: $env:GITHUB_WORKSPACE/output/docs
+        branch: gh-pages
 
     # - name: Checkin git-hub pages
     #   uses: zwaldowski/git-commit-action@v1
