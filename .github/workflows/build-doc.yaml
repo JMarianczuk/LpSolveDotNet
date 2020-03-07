@@ -9,50 +9,65 @@ on:
       - documentation*
 
 jobs:
-  build:
+  build_doc:
     if: github.repository == 'MarcelGosselin/LpSolveDotNet'
 
     runs-on: windows-latest
 
+    env:
+      local_repo: ${{github.workspace}}/output/docs
+      remote_repo: https://${{github.actor}}:mytoken@github.com/${{github.repository}}.git
+      commit_message: "Updated from GitHub workflow '${{github.workflow}}' #${{github.run_number}}"
+
     steps:
-
-    - name: Install docfx
-      run: choco install docfx --version 2.50 -y
-
-    - name: Checkout current commit
-      uses: actions/checkout@v2
-
-    - name: Checkout git-hub pages
-      uses: actions/checkout@v2
-      with:
-        ref: gh-pages
-        path: output/docs
-
-    - name: Add dummy content to doc
+    - name: Test env
       run: |
-        echo "This is from GitHub action" >> $env:GITHUB_WORKSPACE/output/docs/dummy.md
+        echo "local_repo = $local_repo"
+        echo "remote_repo = $remote_repo"
+        echo "commit_message = $commit_message"
+    # - name: Install docfx
+    #   run: choco install docfx --version 2.50 -y
 
-    - name: Test
-      working-directory: $env:GITHUB_WORKSPACE/output/docs
-      run: |
-        ls -al
+    # - name: Checkout current commit
+    #   uses: actions/checkout@v2
 
-    - name: Add files for git-hub pages commit 
-      working-directory: $env:GITHUB_WORKSPACE/output/docs
-      run: |
-        git add .
+    # - name: Checkout git-hub pages
+    #   uses: actions/checkout@v2
+    #   with:
+    #     ref: gh-pages
+    #     path: output/docs
 
-    - name: Commit git-hub pages
-      working-directory: $env:GITHUB_WORKSPACE/output/docs
-      run: |
-        git commit -m "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_NUMBER"
+    # - name: Add dummy content to doc
+    #   run: |
+    #     echo "This is from GitHub action" >> $env:GITHUB_WORKSPACE/output/docs/dummy.md
 
-    - name: Push git-hub pages
-      uses: ad-m/github-push-action@0.5.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        directory: $env:GITHUB_WORKSPACE/output/docs
-        branch: gh-pages
+    # - name: Test
+    #   working-directory: $env:GITHUB_WORKSPACE/output/docs
+    #   run: |
+    #     ls -al
+
+    # - name: Add files for git-hub pages commit 
+    #   working-directory: $env:GITHUB_WORKSPACE/output/docs
+    #   run: |
+    #     git add .
+
+    # - name: Commit git-hub pages
+    #   working-directory: $env:GITHUB_WORKSPACE/output/docs
+    #   run: |
+    #     git commit -m "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_NUMBER"
+
+    # - name: Push git-hub pages
+    #   working-directory: $env:GITHUB_WORKSPACE/output/docs
+    #   run: |
+    #     $remote_repo="https://${GITHUB_ACTOR}:${INPUT_GITHUB_TOKEN}@github.com/${REPOSITORY}.git"
+    #     git push -m "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_NUMBER"
+
+    # - name: Push git-hub pages
+    #   uses: ad-m/github-push-action@0.5.0
+    #   with:
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    #     directory: $env:GITHUB_WORKSPACE/output/docs
+    #     branch: gh-pages
 
     # - name: Checkin git-hub pages
     #   uses: zwaldowski/git-commit-action@v1
