@@ -50,7 +50,7 @@ jobs:
       run: |
         git add .
         git diff --quiet --exit-code --staged
-        echo "::set-env name={has_changes_to_commit}::{$LastExitCode}"
+        echo "::set-env name=has_changes_to_commit::$LastExitCode"
 
     - name: Commit files for git-hub pages commit
       if: env.has_changes_to_commit==1
