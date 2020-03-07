@@ -16,7 +16,7 @@ jobs:
 
     env:
       ghpages_root_relative: output/docs
-      ghpages_root: ${{github.workspace}}/${{env.ghpages_root_relative}}
+      ghpages_root: ${{github.workspace}}/output/docs
       ghpages_branch: gh-pages
       remote_repo: https://${{github.actor}}:${{github.token}}@github.com/${{github.repository}}.git
       commit_message: "Updated from GitHub workflow '${{github.workflow}}' #${{github.run_number}}"
