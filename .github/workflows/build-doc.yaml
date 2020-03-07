@@ -40,7 +40,7 @@ jobs:
 
     - name: Test
       working-directory: ${{env.ghpages_root}}
-      run: ls -al
+      run: ls
 
     - name: Add files for git-hub pages commit 
       working-directory: ${{env.ghpages_root}}
