@@ -38,17 +38,20 @@ jobs:
     - name: Add dummy content to doc
       run: echo "This is from GitHub action" >> ${{env.ghpages_root}}/dummy.md
 
-    - name: Test
-      working-directory: ${{env.ghpages_root}}
-      run: ls
+    # - name: Add files for git-hub pages commit 
+    #   working-directory: ${{env.ghpages_root}}
+    #   run: git add .
 
-    - name: Add files for git-hub pages commit 
-      working-directory: ${{env.ghpages_root}}
-      run: git add .
+    # - name: Commit git-hub pages
+    #   working-directory: ${{env.ghpages_root}}
+    #   run: git commit -m "${{env.commit_message}}"
 
-    - name: Commit git-hub pages
+    - name: Commit files for git-hub pages commit 
       working-directory: ${{env.ghpages_root}}
-      run: git commit -m "${{env.commit_message}}"
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "${{env.commit_message}}" -a
 
     - name: Push git-hub pages
       working-directory: ${{env.ghpages_root}}
