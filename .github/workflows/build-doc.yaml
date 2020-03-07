@@ -22,9 +22,9 @@ jobs:
     steps:
     - name: Test env
       run: |
-        echo "local_repo = $local_repo"
-        echo "remote_repo = $remote_repo"
-        echo "commit_message = $commit_message"
+        echo "local_repo = $env:local_repo"
+        echo "remote_repo = $env:remote_repo"
+        echo "commit_message = $env:commit_message"
     # - name: Install docfx
     #   run: choco install docfx --version 2.50 -y
 
