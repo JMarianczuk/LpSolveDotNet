@@ -32,33 +32,33 @@ jobs:
     - name: Checkout git-hub pages
       uses: actions/checkout@v2
       with:
-        ref: ${{env.ghpages_rootbranch}}
+        ref: ${{env.ghpages_branch}}
         path: ${{env.ghpages_root_relative}}
 
     - name: Add dummy content to doc
-      run: echo "This is from GitHub action" >> ${{env.ghpages_root}/dummy.md
+      run: echo "This is from GitHub action" >> ${{env.ghpages_root}}/dummy.md
 
     - name: Test
-      working-directory: ${{env.ghpages_root}
+      working-directory: ${{env.ghpages_root}}
       run: ls -al
 
     - name: Add files for git-hub pages commit 
-      working-directory: ${{env.ghpages_root}
+      working-directory: ${{env.ghpages_root}}
       run: git add .
 
     - name: Commit git-hub pages
-      working-directory: ${{env.ghpages_root}
+      working-directory: ${{env.ghpages_root}}
       run: git commit -m "${{env.commit_message}}"
 
     - name: Push git-hub pages
-      working-directory: ${{env.ghpages_root}
+      working-directory: ${{env.ghpages_root}}
       run: git push "${{env.remote_repo}}" HEAD:${{env.ghpages_branch}}
 
     # - name: Push git-hub pages
     #   uses: ad-m/github-push-action@0.5.0
     #   with:
     #     github_token: ${{ secrets.GITHUB_TOKEN }}
-    #     directory: ${{env.ghpages_root}
+    #     directory: ${{env.ghpages_root}}
     #     branch: gh-pages
 
     # - name: Checkin git-hub pages
