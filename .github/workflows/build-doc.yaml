@@ -53,10 +53,10 @@ jobs:
         git diff --quiet --exit-code --staged
         if [ $? -eq 1 ]; then
           echo will be 1
-          echo "::set-env name=has_changes_to_commit::1"
+          #echo "::set-env name=has_changes_to_commit::1"
         else
           echo will be 0
-          echo "::set-env name=has_changes_to_commit::0"
+          #echo "::set-env name=has_changes_to_commit::0"
         fi
 
     - name: Commit files for git-hub pages commit
