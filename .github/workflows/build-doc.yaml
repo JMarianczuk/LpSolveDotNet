@@ -15,58 +15,50 @@ jobs:
     runs-on: windows-latest
 
     env:
-      local_repo: ${{github.workspace}}/output/docs
-      remote_repo: https://${{github.actor}}:mytoken@github.com/${{github.repository}}.git
+      ghpages_root_relative: output/docs
+      ghpages_root: ${{github.workspace}}/${{env.ghpages_root_relative}}
+      ghpages_branch: gh-pages
+      remote_repo: https://${{github.actor}}:${{github.token}}@github.com/${{github.repository}}.git
       commit_message: "Updated from GitHub workflow '${{github.workflow}}' #${{github.run_number}}"
 
     steps:
-    - name: Test env
-      run: |
-        echo "local_repo = $env:local_repo"
-        echo "remote_repo = $env:remote_repo"
-        echo "commit_message = $env:commit_message"
-    # - name: Install docfx
-    #   run: choco install docfx --version 2.50 -y
 
-    # - name: Checkout current commit
-    #   uses: actions/checkout@v2
+    - name: Install docfx
+      run: choco install docfx --version 2.50 -y
 
-    # - name: Checkout git-hub pages
-    #   uses: actions/checkout@v2
-    #   with:
-    #     ref: gh-pages
-    #     path: output/docs
+    - name: Checkout current commit
+      uses: actions/checkout@v2
 
-    # - name: Add dummy content to doc
-    #   run: |
-    #     echo "This is from GitHub action" >> $env:GITHUB_WORKSPACE/output/docs/dummy.md
+    - name: Checkout git-hub pages
+      uses: actions/checkout@v2
+      with:
+        ref: ${{env.ghpages_rootbranch}}
+        path: ${{env.ghpages_root_relative}}
 
-    # - name: Test
-    #   working-directory: $env:GITHUB_WORKSPACE/output/docs
-    #   run: |
-    #     ls -al
+    - name: Add dummy content to doc
+      run: echo "This is from GitHub action" >> ${{env.ghpages_root}/dummy.md
 
-    # - name: Add files for git-hub pages commit 
-    #   working-directory: $env:GITHUB_WORKSPACE/output/docs
-    #   run: |
-    #     git add .
+    - name: Test
+      working-directory: ${{env.ghpages_root}
+      run: ls -al
 
-    # - name: Commit git-hub pages
-    #   working-directory: $env:GITHUB_WORKSPACE/output/docs
-    #   run: |
-    #     git commit -m "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_NUMBER"
+    - name: Add files for git-hub pages commit 
+      working-directory: ${{env.ghpages_root}
+      run: git add .
 
-    # - name: Push git-hub pages
-    #   working-directory: $env:GITHUB_WORKSPACE/output/docs
-    #   run: |
-    #     $remote_repo="https://${GITHUB_ACTOR}:${INPUT_GITHUB_TOKEN}@github.com/${REPOSITORY}.git"
-    #     git push -m "Updated from GitHub workflow '$env:GITHUB_WORKFLOW' #$env:GITHUB_RUN_NUMBER"
+    - name: Commit git-hub pages
+      working-directory: ${{env.ghpages_root}
+      run: git commit -m "${{env.commit_message}}"
+
+    - name: Push git-hub pages
+      working-directory: ${{env.ghpages_root}
+      run: git push "${{env.remote_repo}}" HEAD:${{env.ghpages_branch}}
 
     # - name: Push git-hub pages
     #   uses: ad-m/github-push-action@0.5.0
     #   with:
     #     github_token: ${{ secrets.GITHUB_TOKEN }}
-    #     directory: $env:GITHUB_WORKSPACE/output/docs
+    #     directory: ${{env.ghpages_root}
     #     branch: gh-pages
 
     # - name: Checkin git-hub pages
