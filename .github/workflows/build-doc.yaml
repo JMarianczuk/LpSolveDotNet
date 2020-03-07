@@ -48,9 +48,12 @@ jobs:
     - name: Prepare commit
       working-directory: ${{env.ghpages_root}}
       run: |
+        echo add
         git add .
+        echo diff
         git diff --quiet --exit-code --staged
         if ($LastExitCode) {
+          echo setenv1
           echo "::set-env name=has_changes_to_commit::1"
         }
 
