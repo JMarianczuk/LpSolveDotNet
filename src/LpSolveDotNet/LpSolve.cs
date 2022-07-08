@@ -37,7 +37,7 @@ namespace LpSolveDotNet
     public sealed class LpSolve
         : IDisposable
     {
-        #region Library initialization
+#region Library initialization
 
         /// <summary>
         /// Initializes the library by making sure the correct native library will be loaded.
@@ -236,15 +236,15 @@ namespace LpSolveDotNet
 
 #endif
 
-        #endregion
+#endregion
 
-        #region Fields
+#region Fields
 
         private IntPtr _lp;
 
-        #endregion
+#endregion
 
-        #region Create/destroy model
+#region Create/destroy model
 
         /// <summary>
         /// Constructor, to be called from <see cref="CreateFromLpRecStructurePointer"/> only.
@@ -273,10 +273,10 @@ namespace LpSolveDotNet
         /// <returns>A new <see cref="LpSolve"/> model with <paramref name="rows"/> rows and <paramref name="columns"/> columns.
         /// A <c>null</c> return value indicates an error. Specifically not enough memory available to setup an lprec structure.</returns>
         /// <seealso href="http://lpsolve.sourceforge.net/5.5/make_lp.htm">Full C API documentation.</seealso>
-        public static LpSolve make_lp(int rows, int columns)
+        public static ILpSolve make_lp(int rows, int columns)
         {
             IntPtr lp = NativeMethods.make_lp(rows, columns);
-            return CreateFromLpRecStructurePointer(lp);
+            return new LpSolveDotNet(CreateFromLpRecStructurePointer(lp));
         }
 
         /// <summary>
@@ -387,11 +387,11 @@ namespace LpSolveDotNet
             Dispose(false);
         }
 
-        #endregion
+#endregion
 
-        #region Build model
+#region Build model
 
-        #region Column
+#region Column
 
         /// <summary>
         /// Adds a column to the model.
@@ -807,9 +807,9 @@ namespace LpSolveDotNet
         public bool set_lowbo(int column, double value)
             => NativeMethods.set_lowbo(_lp, column, value);
 
-        #endregion // Build model /  Column
+#endregion // Build model /  Column
 
-        #region Constraint / Row
+#region Constraint / Row
 
         /// <summary>
         /// Adds a constraint to the model.
@@ -1143,9 +1143,9 @@ namespace LpSolveDotNet
         public bool str_set_rh_vec(string rh_string)
             => NativeMethods.str_set_rh_vec(_lp, rh_string);
 
-        #endregion
+#endregion
 
-        #region Objective
+#region Objective
 
         /// <summary>
         /// Sets the objective function (row 0) of the matrix.
@@ -1283,7 +1283,7 @@ namespace LpSolveDotNet
         public void set_sense(bool maximize)
             => NativeMethods.set_sense(_lp, maximize);
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Gets the name of the model.
@@ -1595,11 +1595,11 @@ namespace LpSolveDotNet
         public bool is_SOS_var(int column)
             => NativeMethods.is_SOS_var(_lp, column);
 
-        #endregion
+#endregion
 
-        #region Solver settings
+#region Solver settings
 
-        #region Epsilon / Tolerance
+#region Epsilon / Tolerance
 
         /// <summary>
         /// Returns the value that is used as a tolerance for the Right Hand Side (RHS) to determine whether a value should be considered as 0.
@@ -1801,9 +1801,9 @@ namespace LpSolveDotNet
         public bool set_epslevel(lpsolve_epsilon_level level)
             => NativeMethods.set_epslevel(_lp, level);
 
-        #endregion
+#endregion
 
-        #region Basis
+#region Basis
         /// <summary>
         /// Causes reinversion at next opportunity.
         /// </summary>
@@ -2042,9 +2042,9 @@ namespace LpSolveDotNet
         public bool set_BFP(string filename)
             => NativeMethods.set_BFP(_lp, filename);
 
-        #endregion
+#endregion
 
-        #region Pivoting
+#region Pivoting
 
         /// <summary>
         /// Returns the maximum number of pivots between a re-inversion of the matrix.
@@ -2134,9 +2134,9 @@ namespace LpSolveDotNet
         public bool is_piv_mode(lpsolve_pivot_modes testmask)
             => NativeMethods.is_piv_mode(_lp, testmask);
 
-        #endregion
+#endregion
 
-        #region Scaling
+#region Scaling
 
         /// <summary>
         /// Gets the relative scaling convergence criterion for the active scaling mode.
@@ -2253,9 +2253,9 @@ namespace LpSolveDotNet
         public void unscale()
             => NativeMethods.unscale(_lp);
 
-        #endregion
+#endregion
 
-        #region Branching
+#region Branching
 
         /// <summary>
         /// Returns, for the specified variable, which branch to take first in branch-and-bound algorithm.
@@ -2475,7 +2475,7 @@ namespace LpSolveDotNet
         public void put_bb_branchfunc(BranchAndBoundBranchSelector branchSelector)
             => NativeMethods.put_bb_branchfunc(_lp, (x, y, column) => branchSelector(this, column) == BranchSelectorResult.Floor, IntPtr.Zero);
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Returns the iterative improvement level.
@@ -2921,10 +2921,11 @@ namespace LpSolveDotNet
         public void set_presolve(lpsolve_presolve do_presolve, int maxloops)
             => NativeMethods.set_presolve(_lp, do_presolve, maxloops);
 
-        #endregion
+#endregion
 
-        #region Callback methods
+#region Callback methods
 
+        public delegate bool ControlFunction(LpSolve solver, object parameter);
         /// <summary>
         /// Sets a callback called regularly while solving the model to verify if solving should abort.
         /// </summary>
@@ -2939,9 +2940,10 @@ namespace LpSolveDotNet
         /// <para>The default is no abort callback (<c>null</c>).</para>
         /// </remarks>
         /// <seealso href="http://lpsolve.sourceforge.net/5.5/put_abortfunc.htm">Full C API documentation.</seealso>
-        public void put_abortfunc(ctrlcfunc newctrlc, IntPtr ctrlchandle)
-            => NativeMethods.put_abortfunc(_lp, newctrlc, ctrlchandle);
+        public void put_abortfunc(ControlFunction controlFunction, object parameter)
+            => NativeMethods.put_abortfunc(_lp, (lp, _) => controlFunction(new LpSolve(lp), parameter), IntPtr.Zero);
 
+        public delegate void LogFunction(LpSolve solver, object parameter, string message);
         /// <summary>
         /// Sets a log callback.
         /// </summary>
@@ -2953,9 +2955,10 @@ namespace LpSolveDotNet
         /// <para>This method is called at the same time as something is written to the file set via <see cref="set_outputfile"/>.</para>
         /// </remarks>
         /// <seealso href="http://lpsolve.sourceforge.net/5.5/put_logfunc.htm">Full C API documentation.</seealso>
-        public void put_logfunc(logfunc newlog, IntPtr loghandle)
-            => NativeMethods.put_logfunc(_lp, newlog, loghandle);
+        public void put_logfunc(LogFunction logFunction, object parameter)
+            => NativeMethods.put_logfunc(_lp, (lp, _, text) => logFunction(new LpSolve(lp), parameter, text), IntPtr.Zero);
 
+        public delegate void MessageFunction(LpSolve solver, object parameter, lpsolve_msgmask messageMask);
         /// <summary>
         /// Sets a message callback called upon certain events.
         /// </summary>
@@ -2968,13 +2971,13 @@ namespace LpSolveDotNet
         /// This can be useful to follow the solving progress.
         /// </remarks>
         /// <seealso href="http://lpsolve.sourceforge.net/5.5/put_msgfunc.htm">Full C API documentation.</seealso>
-        public void put_msgfunc(msgfunc newmsg, IntPtr msghandle, lpsolve_msgmask mask)
-            => NativeMethods.put_msgfunc(_lp, newmsg, msghandle, mask);
+        public void put_msgfunc(MessageFunction messageFunction, object parameter, lpsolve_msgmask messageMask)
+            => NativeMethods.put_msgfunc(_lp, (lp, _, messageMask) => messageFunction(new LpSolve(lp), parameter, messageMask), IntPtr.Zero, messageMask);
 
 
-        #endregion
+#endregion
 
-        #region Solve
+#region Solve
 
         /// <summary>
         /// Solve the model.
@@ -3000,9 +3003,9 @@ namespace LpSolveDotNet
         public lpsolve_return solve()
             => NativeMethods.solve(_lp);
 
-        #endregion
+#endregion
 
-        #region Solution
+#region Solution
 
         /// <summary>
         /// Gets the value of a constraint according to provided variable values.
@@ -3310,9 +3313,9 @@ namespace LpSolveDotNet
         public bool is_feasible(double[] values, double threshold)
             => NativeMethods.is_feasible(_lp, values, threshold);
 
-        #endregion
+#endregion
 
-        #region Debug/print settings
+#region Debug/print settings
 
         /// <summary>
         /// Defines the output when lp_solve has something to report.
@@ -3440,9 +3443,9 @@ namespace LpSolveDotNet
         public void set_trace(bool trace)
             => NativeMethods.set_trace(_lp, trace);
 
-        #endregion
+#endregion
 
-        #region Debug/print
+#region Debug/print
 
         /// <summary>
         /// Prints the values of the constraints of the lp model.
@@ -3554,9 +3557,9 @@ namespace LpSolveDotNet
         public void print_tableau()
             => NativeMethods.print_tableau(_lp);
 
-        #endregion
+#endregion
 
-        #region Write model to file
+#region Write model to file
 
         /// <summary>
         /// Write the model in the lp format to <paramref name="filename"/>.
@@ -3659,9 +3662,9 @@ namespace LpSolveDotNet
         public bool write_XLI(string filename, string options, bool results)
             => NativeMethods.write_XLI(_lp, filename, options, results);
 
-        #endregion
+#endregion
 
-        #region Miscellaneous methods
+#region Miscellaneous methods
 
         /// <summary>
         /// Returns the version of the lpsolve library loaded ar runtime.
@@ -3827,6 +3830,6 @@ namespace LpSolveDotNet
         public int get_orig_index(int lp_index)
             => NativeMethods.get_orig_index(_lp, lp_index);
 
-        #endregion
+#endregion
     }
 }

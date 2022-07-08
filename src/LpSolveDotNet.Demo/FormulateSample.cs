@@ -22,12 +22,14 @@ namespace LpSolveDotNet.Demo
             // So we start with creating a model with 0 rows and 2 columns
             int Ncol = 2; // there are two variables in the model 
 
-            using (LpSolve lp = LpSolve.make_lp(0, Ncol))
+            using (var ilp = LpSolve.make_lp(0, Ncol))
             {
-                if (lp == null)
+                if (ilp == null)
                 {
                     return 1; // couldn't construct a new model...
                 }
+
+                var lp = ilp.UnderlyingSolver;
 
                 //let us name our variables. Not required, but can be useful for debugging
                 lp.set_col_name(1, "x");

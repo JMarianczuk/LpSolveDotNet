@@ -11,18 +11,18 @@ namespace LpSolveDotNet.Demo
         /* unsafe is needed to make sure that these function are not relocated in memory by the CLR. If that would happen, a crash occurs */
         /* go to the project property page and in “configuration properties>build” set Allow Unsafe Code Blocks to True. */
         /* see http://msdn2.microsoft.com/en-US/library/chfa2zb8.aspx and http://msdn2.microsoft.com/en-US/library/t2yzs44b.aspx */
-        private /* unsafe */ static void logfunc(IntPtr lp, IntPtr userhandle, string Buf)
+        private /* unsafe */ static void LogFunction(LpSolve lp, object parameter, string Buf)
         {
             Debug.Write(Buf);
         }
 
-        private /* unsafe */ static bool ctrlcfunc(IntPtr lp, IntPtr userhandle)
+        private /* unsafe */ static bool AbortFunction(LpSolve lp, object parameter)
         {
             // 'If set to true, then solve is aborted and returncode will indicate this.
             return (false);
         }
 
-        private /* unsafe */ static void msgfunc(IntPtr lp, IntPtr userhandle, lpsolve_msgmask message)
+        private /* unsafe */ static void MessageFunction(LpSolve lp, object parameter, lpsolve_msgmask message)
         {
             Debug.WriteLine(message);
         }
@@ -54,12 +54,13 @@ namespace LpSolveDotNet.Demo
             double[] Col;
             double[] Arry;
 
-            using (var lp = LpSolve.make_lp(0, 4))
+            using (var ilp = LpSolve.make_lp(0, 4))
             {
                 Version version = LpSolve.LpSolveVersion;
+                var lp = ilp.UnderlyingSolver;
 
                 /* let's first demonstrate the logfunc callback feature */
-                lp.put_logfunc(logfunc, IntPtr.Zero);
+                lp.put_logfunc(LogFunction, IntPtr.Zero);
                 lp.print_str("lp_solve " + version + " demo" + NewLine + NewLine);
                 lp.solve(); /* just to see that a message is send via the logfunc routine ... */
                 /* ok, that is enough, no more callback */
@@ -69,10 +70,10 @@ namespace LpSolveDotNet.Demo
                 lp.set_outputfile("result.txt");
 
                 /* set an abort function. Again optional */
-                lp.put_abortfunc(ctrlcfunc, IntPtr.Zero);
+                lp.put_abortfunc(AbortFunction, IntPtr.Zero);
 
                 /* set a message function. Again optional */
-                lp.put_msgfunc(msgfunc, IntPtr.Zero, lpsolve_msgmask.MSG_PRESOLVE | lpsolve_msgmask.MSG_LPFEASIBLE | lpsolve_msgmask.MSG_LPOPTIMAL | lpsolve_msgmask.MSG_MILPEQUAL | lpsolve_msgmask.MSG_MILPFEASIBLE | lpsolve_msgmask.MSG_MILPBETTER);
+                lp.put_msgfunc(MessageFunction, IntPtr.Zero, lpsolve_msgmask.MSG_PRESOLVE | lpsolve_msgmask.MSG_LPFEASIBLE | lpsolve_msgmask.MSG_LPOPTIMAL | lpsolve_msgmask.MSG_MILPEQUAL | lpsolve_msgmask.MSG_MILPFEASIBLE | lpsolve_msgmask.MSG_MILPBETTER);
 
                 lp.print_str("lp_solve " + version + " demo" + NewLine + NewLine);
                 lp.print_str("This demo will show most of the features of lp_solve " + version + NewLine);
